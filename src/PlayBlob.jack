@@ -1,0 +1,43 @@
+class PlayBlob {
+	field Blob blob;
+
+	constructor PlayBlob new() {
+		let blob = Blob.new(100);
+		return this;
+	}
+
+	method void run() {
+		var char key;
+		var int direction;
+		var boolean moved, exit;
+		let exit = false;
+		while ((~exit) & (key = 0)) {
+				let key = Keyboard.keyPressed();
+				let moved = blob.move(0);
+				if (~moved) {
+					let exit = true;
+					return;
+				}
+			if (key = 130) { // left
+				let direction = 3;
+			}
+			if (key = 131) { // up
+				let direction = 1;
+			}
+			if (key = 132) { // right
+				let direction = 4;
+			}
+			if (key = 133) { // down
+				let direction = 2;
+			}
+			while (~(key = 0)) { // while key is pressed
+				let key = Keyboard.keyPressed();
+				let moved = blob.move(direction);
+				if(~moved) {
+					let exit = true;
+				}
+			}
+		}
+		return;
+	}
+}

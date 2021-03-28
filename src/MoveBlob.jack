@@ -1,0 +1,85 @@
+class MoveBlob {
+	field int x; // x coordinate
+	field int y; // y coordinate
+	field int radius; // radius of the blob
+	field int direction; // 1 = up, 2 = down, 3 = left, 4 = right
+
+	constructor MoveBlob new(int nX, int nY, int nR, int nDirection) {
+		let x = nX;
+		let y = nY;
+		let radius = nR;
+		let direction = nDirection;
+		do draw();
+		return this;
+	}
+
+	method int get_direction() {
+		return direction;
+	}
+
+	method int get_x() {
+		return x;
+	}
+	method int get_y() {
+		return y;
+	}
+
+	method void set_direction(int n_direction) {
+		let direction = n_direction;
+		return;
+	}
+
+	method void draw() {
+		do Screen.setColor(true);
+		do Screen.drawCircle(x, y, radius);
+		return;
+	}
+
+	method boolean move() {
+		var int pixels_per_ms;
+
+		let pixels_per_ms = 10;
+
+		if (direction = 1) { // up
+			if (y > 10) {
+				do Screen.setColor(false);
+				do Screen.drawCircle(x, y, 5);
+				let y = y - pixels_per_ms;
+				do Screen.setColor(true);
+				do Screen.drawCircle(x, y, 5);
+				}
+			return true;
+		}
+		if (direction = 2) { // down
+			if (y < 250) {
+				do Screen.setColor(false);
+				do Screen.drawCircle(x, y, 5);
+				let y = y + pixels_per_ms;
+				do Screen.setColor(true);
+				do Screen.drawCircle(x, y, 5);
+			}
+			return true;
+		}
+		if (direction = 3) { // left
+			if (x > 10) {
+				do Screen.setColor(false);
+				do Screen.drawCircle(x, y, 5);
+				let x = x - pixels_per_ms;
+				do Screen.setColor(true);
+				do Screen.drawCircle(x, y, 5);
+			}
+			return true;
+		}
+		if (direction = 4) { // right
+			if (x < 500) {
+				do Screen.setColor(false);
+				do Screen.drawCircle(x, y, 5);
+				let x = x + pixels_per_ms;
+				do Screen.setColor(true);
+				do Screen.drawCircle(x, y, 5);
+			}
+			return true;
+		}
+		return false;
+	}
+}

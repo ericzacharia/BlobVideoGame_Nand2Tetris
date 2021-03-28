@@ -1,0 +1,181 @@
+class Blob {
+	field Array poison_food_xcoords;
+	field Array poison_food_ycoords;
+	field int blob;
+	field int max_size, curr_size, blob_radius;
+	field int poison_food_radius, food_radius;
+	field int num_poison_foods, poisonx, poisony;
+	field int seedx, seedy;
+	field int pseedx, pseedy;
+	field int foodx, foody;
+	field int random1, random2;
+	field int score;
+	field int startx, starty, startdirection;
+
+	constructor Blob new(int max_size) {
+		let blob_radius = 5;
+		let poison_food_radius = 4;
+		let food_radius = 4;
+		let poison_food_xcoords = Array.new(max_size);
+		let poison_food_ycoords = Array.new(max_size);
+		let num_poison_foods = 0;
+		let poisonx = 125;
+		let poisony = 125;
+		let foodx = 100;
+		let foody = 100;
+		let seedx = 15;
+		let seedy = 25;
+		let pseedx = 55;
+		let pseedy = 35;
+		let random1 = 20;
+		let random2 = 40;
+
+		do Output.moveCursor(12, 5);
+		do Output.printString("Eat the food that looks like you, but not the poison!");
+		do Sys.wait(3000);  // Conrols length of initial game message
+		do Screen.clearScreen();
+
+		// create blob
+		let startx = 20;
+		let starty = 30;
+		let startdirection = 4;  // right
+		let blob = MoveBlob.new(startx, starty, blob_radius, startdirection);
+		do draw();
+		do initial_score();
+		do draw_food();
+		return this;
+	}
+
+	method void initial_score() {
+		let score = 0;
+		do Output.moveCursor(1, 1);
+		do Output.printString("Score: ");
+		do Output.printInt(score);
+		return;
+
+	}
+
+	method void increment_score() {
+		let score = score + 1;
+		do Output.moveCursor(1, 1);
+		do Output.printString("Score: ");
+		do Output.printInt(score);
+		return;
+	}
+	
+	method void draw() {
+		var MoveBlob mblob;
+		let mblob = blob;
+		do mblob.draw();
+		return;
+	}
+
+	method boolean move(int direction) {
+		var MoveBlob mblob;
+		var int blob_direction;
+		var int x_location, y_location;
+
+		if (check_hit_wall_or_poison()) { 
+			return false; 
+			}
+		let mblob = blob;
+		let blob_direction = mblob.get_direction();
+
+		if (~(direction = 0)) {
+			do mblob.set_direction(direction);
+		}
+		
+		do mblob.move();
+		
+		let x_location = mblob.get_x();
+		let y_location = mblob.get_y();
+		if ((x_location < foodx + blob_radius) & (x_location > foodx - blob_radius) & (y_location > foody - blob_radius) & (y_location < foody + blob_radius)) {
+			let blob_direction = mblob.get_direction();
+			do eat(blob_direction, x_location, y_location);
+			do increment_score();
+		}
+		
+		do draw();
+		do Sys.wait(90);  // Controls pauses in ms between each refresh of game, larger is slower
+		return true;
+	}
+
+	method boolean check_hit_wall_or_poison() {
+		var MoveBlob mblob;
+		var int blob_x;
+		var int blob_y;
+		var int count;
+
+		let mblob = blob;
+		let blob_x = mblob.get_x();
+		let blob_y = mblob.get_y();
+		if ((blob_x < 11) | (blob_x > 499) | (blob_y < 11) | (blob_y > 249)){
+			do Screen.clearScreen();
+			do Output.moveCursor(20, 20);
+			do Output.printString("Game Over.");
+			do Output.printString("    Final Score: ");
+			do Output.printInt(score);
+			return true;
+		}
+
+		let count = 0;
+		while (count < num_poison_foods) {
+			if ((poison_food_xcoords[count] = blob_x) & (poison_food_ycoords[count] = blob_y)) {
+				do Screen.clearScreen();
+				do Output.moveCursor(20, 20);
+				do Output.printString("Game Over.");
+				do Output.printString("    Final Score: ");
+				do Output.printInt(score);
+				return true;
+				}
+			let count = count + 1;
+			}
+		return false;
+	}
+
+	method boolean eat(int blob_direction, int x_location, int y_location) { // blob eats food
+		do Screen.setColor(false);  
+		do Screen.drawCircle(foodx, foody, food_radius); // clear the food from the screen
+		do draw_food();
+		return true;
+	}
+
+	method void draw_food() { 	// draw food and poison on the screen
+		var int nX;
+		var int nY;
+		var int pnX;
+		var int pnY;
+
+		let nX = random1 * seedx + random2;
+		let foodx = nX - ((nX / 470) * 470);
+		let seedx = foodx;
+		let nY = random1 * seedy + random2;
+		let foody = nY - ((nY / 230) * 230);
+		let seedy = foody;
+
+		// Draw Food
+		do Screen.setColor(true);
+		do Screen.drawCircle(foodx, foody, food_radius);
+
+		if (score > 0) {
+			let pnX = random1 * pseedx + random2;
+			let pnY = random1 * pseedy + random2;
+			let poisonx = (pnX - ((pnX / 450) * 450));
+			let pseedx = poisonx;
+			let poisony = (pnY - ((pnY / 200) * 200));
+			let pseedy = poisony;
+			
+			// Add coordinates of poison food to list
+			let poison_food_xcoords[num_poison_foods] = poisonx;
+			let poison_food_ycoords[num_poison_foods] = poisony;
+			let num_poison_foods = num_poison_foods + 1;
+
+			// Draw Poison
+			do Screen.drawCircle(poisonx, poisony, poison_food_radius);
+			do Screen.setColor(false);
+			do Screen.drawCircle(poisonx, poisony, poison_food_radius / 2);
+			
+		}
+		return;
+	}
+}

@@ -1,0 +1,8 @@
+class Main {
+	function void main() {
+		var PlayBlob game;
+		let game = PlayBlob.new();
+		do game.run();
+		return;
+	}
+}
